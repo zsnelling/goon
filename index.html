@@ -27,11 +27,6 @@
             height: 100%;
             border: none;
             object-fit: cover;
-            pointer-events: auto;
-        }
-
-        video::-webkit-media-controls {
-            display: none !important;
         }
 
         #top-left {
@@ -53,11 +48,23 @@
             bottom: 0;
             right: 0;
         }
+
+        #fullscreen-toggle {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            cursor: pointer;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
 
     <div id="videoDisplayArea"></div>
+    <div id="fullscreen-toggle"></div>
 
     <script>
         const videoUrls = [
@@ -92,18 +99,38 @@
                 videoElement.autoplay = true;
                 videoElement.loop = true;
                 videoElement.muted = true;
-                videoElement.setAttribute('playsinline', '');
-                videoElement.controls = true;
+                videoElement.playsInline = true;
+                videoElement.controls = false;
 
                 const videoWrapper = document.createElement("div");
                 videoWrapper.classList.add("video-container");
                 videoWrapper.id = positions[index];
                 videoWrapper.appendChild(videoElement);
                 videoDisplayArea.appendChild(videoWrapper);
+
+                videoElement.play().catch(error => {
+                    console.log("Autoplay prevented or failed:", error);
+                });
             });
         }
 
-        window.addEventListener('load', displayVideos);
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message} (${err.name})`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        window.addEventListener('load', () => {
+            displayVideos();
+            const fullscreenToggle = document.getElementById("fullscreen-toggle");
+            fullscreenToggle.addEventListener("click", toggleFullscreen);
+        });
     </script>
 
 </body>
