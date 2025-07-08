@@ -1,113 +1,106 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<style>
-		body {
-			margin: 0;
-			padding: 0;
-			overflow: hidden;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 100vh;
-		}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Video Display</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+        }
 
-		.video-container {
-			position: absolute;
-			width: 50%;
-			height: 50%;
-		}
+        .video-container {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+        }
 
-		video {
-			width: 100%;
-			height: 100%;
-			border: none;
-			object-fit: cover;
-		}
+        video {
+            width: 100%;
+            height: 100%;
+            border: none;
+            object-fit: cover;
+            pointer-events: auto;
+        }
 
-		video::-webkit-media-controls {
-			display: none !important;
-		}
+        video::-webkit-media-controls {
+            display: none !important;
+        }
 
-		video {
-			pointer-events: none;
-		}
+        #top-left {
+            top: 0;
+            left: 0;
+        }
 
-		#top-left {
-			top: 0;
-			left: 0;
-		}
+        #top-right {
+            top: 0;
+            right: 0;
+        }
 
-		#top-right {
-			top: 0;
-			right: 0;
-		}
+        #bottom-left {
+            bottom: 0;
+            left: 0;
+        }
 
-		#bottom-left {
-			bottom: 0;
-			left: 0;
-		}
-
-		#bottom-right {
-			bottom: 0;
-			right: 0;
-		}
-	</style>
+        #bottom-right {
+            bottom: 0;
+            right: 0;
+        }
+    </style>
 </head>
 <body>
 
-	<div id="videoContainer"></div>
+    <div id="videoDisplayArea"></div>
 
-	<script>
-		const videoUrls = [
-			"https://static1.e621.net/data/06/19/0619ff5a8270aed7b22ca3981b783224.webm",
-			"https://static1.e621.net/data/0e/35/0e35892d0c8846013a0512880a63033f.webm",
-			"https://static1.e621.net/data/15/81/1581e54d9dd85386644c2e2dcce813ed.webm",
-			"https://static1.e621.net/data/46/29/46297de20ae823219e239fb306f6e37e.webm",
-			"https://static1.e621.net/data/60/00/6000e4cd0dacb3f055789e7d85971a00.webm",
-			"https://static1.e621.net/data/62/3a/623a47608004c3dc1f11762c9055486a.webm",
-			"https://static1.e621.net/data/7f/f7/7ff738ada042264d25d62f35d0cefcc4.webm",
-			"https://static1.e621.net/data/a2/7a/a27a89751f74fa9557a583e71c96538b.webm",
-			"https://static1.e621.net/data/b3/a5/b3a524f3928c3136af0ab26e14fadaf4.webm",
-		];
+    <script>
+        const videoUrls = [
+            "https://static1.e621.net/data/06/19/0619ff5a8270aed7b22ca3981b783224.webm",
+            "https://static1.e621.net/data/0e/35/0e35892d0c8846013a0512880a63033f.webm",
+            "https://static1.e621.net/data/15/81/1581e54d9dd85386644c2e2dcce813ed.webm",
+            "https://static1.e621.net/data/46/29/46297de20ae823219e239fb306f6e37e.webm",
+            "https://static1.e621.net/data/60/00/6000e4cd0dacb3f055789e7d85971a00.webm",
+            "https://static1.e621.net/data/62/3a/623a47608004c3dc1f11762c9055486a.webm",
+            "https://static1.e621.net/data/7f/f7/7ff738ada042264d25d62f35d0cefcc4.webm",
+            "https://static1.e621.net/data/a2/7a/a27a89751f74fa9557a583e71c96538b.webm",
+            "https://static1.e621.net/data/b3/a5/b3a524f3928c3136af0ab26e14fadaf4.webm",
+        ];
 
-		function getRandomVideos(videoList, numVideos) {
-			const selectedVideos = [];
-			while (selectedVideos.length < numVideos) {
-				const randomIndex = Math.floor(Math.random() * videoList.length);
-				const video = videoList[randomIndex];
-				if (!selectedVideos.includes(video)) {
-					selectedVideos.push(video);
-				}
-			}
-			return selectedVideos;
-		}
+        function getRandomVideos(videoList, numVideos) {
+            const shuffled = [...videoList].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, numVideos);
+        }
 
-		function displayVideos() {
-			const videoContainer = document.getElementById("videoContainer");
-			const randomVideos = getRandomVideos(videoUrls, 4);
+        function displayVideos() {
+            const videoDisplayArea = document.getElementById("videoDisplayArea");
+            const randomVideos = getRandomVideos(videoUrls, 4);
+            const positions = ["top-left", "top-right", "bottom-left", "bottom-right"];
 
-			const positions = ["top-left", "top-right", "bottom-left", "bottom-right"];
+            randomVideos.forEach((url, index) => {
+                const videoElement = document.createElement("video");
+                videoElement.src = url;
+                videoElement.autoplay = true;
+                videoElement.loop = true;
+                videoElement.muted = true;
+                videoElement.setAttribute('playsinline', '');
+                videoElement.controls = true;
 
-			randomVideos.forEach((url, index) => {
-				const videoElement = document.createElement("video");
-				videoElement.src = url;
-				videoElement.autoplay = true;
-				videoElement.loop = true;
-				videoElement.setAttribute('playsinline', '');
+                const videoWrapper = document.createElement("div");
+                videoWrapper.classList.add("video-container");
+                videoWrapper.id = positions[index];
+                videoWrapper.appendChild(videoElement);
+                videoDisplayArea.appendChild(videoWrapper);
+            });
+        }
 
-				const videoWrapper = document.createElement("div");
-				videoWrapper.classList.add("video-container");
-				videoWrapper.id = positions[index];
-				videoWrapper.appendChild(videoElement);
-				videoContainer.appendChild(videoWrapper);
-			});
-		}
-
-		window.onload = displayVideos;
-	</script>
+        window.addEventListener('load', displayVideos);
+    </script>
 
 </body>
 </html>
